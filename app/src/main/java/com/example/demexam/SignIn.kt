@@ -3,19 +3,26 @@ package com.example.demexam
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.example.demexam.databinding.ActivitySignInBinding
 import okhttp3.*
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.IOException
 
 class SignIn : AppCompatActivity() {
     private lateinit var binding: ActivitySignInBinding
     private val emailRegex = "[a-z0-9]+@[a-z0-9]+\\.+[a-z]{2,3}"
     private val client = OkHttpClient()
+    private lateinit var alertDialog: AlertDialog.Builder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        alertDialog = AlertDialog.Builder(this)
 
         binding.signUpOnClick.setOnClickListener {
             startActivity(Intent(this, SignUp::class.java))
@@ -23,21 +30,48 @@ class SignIn : AppCompatActivity() {
         binding.signInOnClick.setOnClickListener {
             if (binding.emailEditText.text.isNotEmpty() and binding.passwordEditText.text.isNotEmpty()){
                 if (binding.emailEditText.text.toString().trim().matches(emailRegex.toRegex())){
-                    val formBody = FormBody.Builder()
-                        .add("email", binding.emailEditText.text.toString())
-                        .add("password", binding.passwordEditText.text.toString())
-                        .build()
+                    val requestBody = RequestBody.create(
+                        MediaType.parse("application/json"),
+                        JSONObject()
+                            .put("email", binding.emailEditText.text.toString())
+                            .put("password", binding.passwordEditText.text.toString())
+                            .toString()
+                    )
                     val request = Request.Builder()
-                        .url("http://wsk2019.mad.hakta.pro/api/user/login")
-                        .post(formBody)
+                        .url("${Global.base_url}/user/login")
+                        .post(requestBody)
                         .build()
-                    client.newCall(request).enqueue(object : Callback{
+                    client.newCall(request).enqueue(object : Callback {
                         override fun onFailure(call: Call, e: IOException) {
-                            println("Noooo")
+                            this@SignIn.runOnUiThread(java.lang.Runnable {
+                                alertDialog
+                                    .setTitle("Ошибка")
+                                    .setMessage("Произошла ошибка при связи с сервером")
+                                    .setCancelable(true)
+                                    .setPositiveButton("Ок") { dialog, it ->
+                                        dialog.cancel()
+                                    }
+                            })
                         }
-
                         override fun onResponse(call: Call, response: Response) {
-                            println("-------------   " + response.code())
+                            if (response.code() == 200){
+                                val json = JSONObject(response.body()?.string().toString())
+                                this@SignIn.runOnUiThread(java.lang.Runnable {
+                                    startActivity(Intent(this@SignIn, MainActivity::class.java))
+                                })
+                                Global.token = json.getString("token")
+                            }
+                            if (response.code() == 469){
+                                this@SignIn.runOnUiThread(java.lang.Runnable {
+                                    alertDialog
+                                        .setTitle("Ошибка")
+                                        .setMessage("Пользователь с таким логином не найден")
+                                        .setCancelable(true)
+                                        .setPositiveButton("Ok"){dialog, it ->
+                                            dialog.cancel()
+                                        }.show()
+                                })
+                            }
                         }
 
                     })
