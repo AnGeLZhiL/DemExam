@@ -37,6 +37,14 @@ class SignIn : AppCompatActivity() {
                             .put("password", binding.passwordEditText.text.toString())
                             .toString()
                     )
+
+                    """
+                        request = Request.Builder()
+                            .url(*ссылка*)
+                            .addHeader(*заголовок*, *значение*) // необязательно
+                            .post(*тело запроса*) // если POST запрос
+                            .build()
+                    """.trimIndent()
                     val request = Request.Builder()
                         .url("${Global.base_url}/user/login")
                         .post(requestBody)
