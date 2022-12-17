@@ -9,5 +9,6 @@ class Global {
         var token: String = ""
         var user = User("", "","","","","","")
         var citys = ArrayList<CityModel>()
+        var selectCity = ""
     }
 }

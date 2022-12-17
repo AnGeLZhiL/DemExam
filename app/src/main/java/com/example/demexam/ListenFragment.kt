@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.navigation.fragment.findNavController
 import com.example.demexam.adapter.CityAdapter
 import com.example.demexam.databinding.FragmentListenBinding
 import com.example.demexam.model.CityModel
@@ -14,8 +16,9 @@ import okhttp3.*
 import okio.IOException
 import org.json.JSONArray
 
-class ListenFragment : Fragment() {
+class ListenFragment : Fragment(), CityAdapter.Listner {
     private lateinit var binding: FragmentListenBinding
+    private val adapter = CityAdapter(this)
     private val client = OkHttpClient()
 
     override fun onCreateView(
@@ -43,11 +46,16 @@ class ListenFragment : Fragment() {
                         Global.citys.add(CityModel(r[i].toString()))
                     }
                     Handler(Looper.getMainLooper()).post {
-                        binding.citysRecycler.adapter = CityAdapter()
+                        binding.citysRecycler.adapter = adapter
                     }
                 }
                 else println("Ошибочка вышла")
             }
         })
+    }
+
+    override fun onClickItem(cityModel: CityModel) {
+        findNavController().navigate(R.id.action_listenFragment_to_testFragment2)
+        Global.selectCity = cityModel.city
     }
 }

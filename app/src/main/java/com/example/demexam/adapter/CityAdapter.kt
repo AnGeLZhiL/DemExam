@@ -10,12 +10,16 @@ import com.example.demexam.R
 import com.example.demexam.databinding.RecyclerCityBinding
 import com.example.demexam.model.CityModel
 
-class CityAdapter : RecyclerView.Adapter<CityAdapter.CityViewHolder>() {
+class CityAdapter (val listner: Listner) : RecyclerView.Adapter<CityAdapter.CityViewHolder>() {
 
     class CityViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         val binding = RecyclerCityBinding.bind(itemView)
-        fun bind(cityModel: CityModel) = with(binding){
+        fun bind(cityModel: CityModel, listner: Listner) = with(binding){
             cityTextView.text = cityModel.city
+
+            itemView.setOnClickListener {
+                listner.onClickItem(cityModel)
+            }
         }
     }
 
@@ -24,8 +28,13 @@ class CityAdapter : RecyclerView.Adapter<CityAdapter.CityViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: CityViewHolder, position: Int) {
-        holder.bind(Global.citys[position])
+        holder.bind(Global.citys[position], listner)
     }
 
     override fun getItemCount() = Global.citys.size
+
+
+    interface Listner {
+        fun onClickItem(cityModel: CityModel)
+    }
 }
