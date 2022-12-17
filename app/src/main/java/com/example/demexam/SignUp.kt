@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.example.demexam.databinding.ActivitySignUpBinding
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.json.JSONObject
 import java.io.IOException
 
@@ -31,7 +32,7 @@ class SignUp : AppCompatActivity() {
             if (binding.emailEditText.text.isNotEmpty() and binding.passwordEditText.text.isNotEmpty() and binding.nameEditText.text.isNotEmpty()){
                 if (binding.emailEditText.text.toString().trim().matches(emailRegex.toRegex())){
                     val requestBody = RequestBody.create(
-                        MediaType.parse("application/json"),
+                        "application/json".toMediaTypeOrNull(),
                         JSONObject()
                             .put("email", binding.emailEditText.text.toString())
                             .put("nickName", binding.nameEditText.text.toString())
@@ -58,10 +59,10 @@ class SignUp : AppCompatActivity() {
                         }
 
                         override fun onResponse(call: Call, response: Response) {
-                            if (response.code() == 200){
+                            if (response.code == 200){
                                 SignIn(binding.emailEditText.text.toString(), binding.passwordEditText.text.toString())
                             }
-                            if (response.code() == 465){
+                            if (response.code == 465){
                                 this@SignUp.runOnUiThread(java.lang.Runnable {
                                     alertDialog
                                         .setTitle("Ошибка")
@@ -89,7 +90,7 @@ class SignUp : AppCompatActivity() {
 
     fun SignIn(email: String, password: String){
         val requestBody = RequestBody.create(
-            MediaType.parse("application/json"),
+            "application/json".toMediaTypeOrNull(),
             JSONObject()
                 .put("email", email)
                 .put("password", password)
@@ -112,15 +113,15 @@ class SignUp : AppCompatActivity() {
                 })
             }
             override fun onResponse(call: Call, response: Response) {
-                if (response.code() == 200){
-                    val json = JSONObject(response.body()?.string().toString())
+                if (response.code == 200){
+                    val json = JSONObject(response.body.string())
                     this@SignUp.runOnUiThread(java.lang.Runnable {
                         startActivity(Intent(this@SignUp, MainActivity::class.java))
                         finish()
                     })
                     Global.token = json.getString("token")
                 }
-                if (response.code() == 469){
+                if (response.code == 469){
                     this@SignUp.runOnUiThread(java.lang.Runnable {
                         alertDialog
                             .setTitle("Ошибка")

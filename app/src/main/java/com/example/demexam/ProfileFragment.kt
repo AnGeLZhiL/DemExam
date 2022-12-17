@@ -1,12 +1,16 @@
 package com.example.demexam
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.demexam.databinding.FragmentProfileBinding
+import com.squareup.picasso.Picasso
 import okhttp3.*
+import org.json.JSONObject
 import java.io.IOException
 
 class ProfileFragment : Fragment() {
@@ -33,7 +37,22 @@ class ProfileFragment : Fragment() {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                println(response.body()?.string().toString())
+                val json = JSONObject(response.body.string())
+                val jsonObject = json.getJSONObject("content")
+                println(jsonObject)
+                Global.user.id = jsonObject.getString("id")
+                Global.user.email = jsonObject.getString("email")
+                Global.user.firstname = jsonObject.getString("firstName")
+                Global.user.lastName = jsonObject.getString("lastName")
+                Global.user.nickName = jsonObject.getString("nickName")
+                Global.user.image = jsonObject.getString("avatar")
+                Global.user.city = jsonObject.getString("city")
+                Handler(Looper.getMainLooper()).post {
+                    binding.nickNameTextView.text = Global.user.nickName
+                    binding.emailTextView.text = Global.user.email
+                    binding.cityTextView.text = Global.user.city
+                    Picasso.get().load(Global.user.image).into(binding.imageUser)
+                }
             }
         })
     }

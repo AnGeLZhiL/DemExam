@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.example.demexam.databinding.ActivitySignInBinding
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
@@ -31,7 +32,7 @@ class SignIn : AppCompatActivity() {
             if (binding.emailEditText.text.isNotEmpty() and binding.passwordEditText.text.isNotEmpty()){
                 if (binding.emailEditText.text.toString().trim().matches(emailRegex.toRegex())){
                     val requestBody = RequestBody.create(
-                        MediaType.parse("application/json"),
+                        "application/json".toMediaTypeOrNull(),
                         JSONObject()
                             .put("email", binding.emailEditText.text.toString())
                             .put("password", binding.passwordEditText.text.toString())
@@ -62,14 +63,14 @@ class SignIn : AppCompatActivity() {
                             })
                         }
                         override fun onResponse(call: Call, response: Response) {
-                            if (response.code() == 200){
-                                val json = JSONObject(response.body()?.string().toString())
+                            if (response.code == 200){
+                                val json = JSONObject(response.body.string())
                                 this@SignIn.runOnUiThread(java.lang.Runnable {
                                     startActivity(Intent(this@SignIn, MainActivity::class.java))
                                 })
                                 Global.token = json.getString("token")
                             }
-                            if (response.code() == 469){
+                            if (response.code == 469){
                                 this@SignIn.runOnUiThread(java.lang.Runnable {
                                     alertDialog
                                         .setTitle("Ошибка")
