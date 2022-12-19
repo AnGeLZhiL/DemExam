@@ -1,6 +1,7 @@
 package com.example.demexam
 
 import com.example.demexam.model.CityModel
+import com.example.demexam.model.DepModel
 import com.example.demexam.model.User
 
 class Global {
@@ -10,5 +11,7 @@ class Global {
         var user = User("", "","","","","","")
         var citys = ArrayList<CityModel>()
         var selectCity = ""
+        var depList = ArrayList<DepModel>()
+        var name = ""
     }
 }

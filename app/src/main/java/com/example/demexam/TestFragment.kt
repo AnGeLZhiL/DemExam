@@ -20,6 +20,6 @@ class TestFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.textView.text = Global.selectCity
+        binding.textView.text = Global.name
     }
 }

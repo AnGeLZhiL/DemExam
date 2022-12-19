@@ -69,6 +69,7 @@ class SignIn : AppCompatActivity() {
                                     startActivity(Intent(this@SignIn, MainActivity::class.java))
                                 })
                                 Global.token = json.getString("token")
+                                println("------------" + Global.token)
                             }
                             if (response.code == 469){
                                 this@SignIn.runOnUiThread(java.lang.Runnable {
